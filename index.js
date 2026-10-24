@@ -1,10 +1,15 @@
 import express from 'express';
 import { MongoClient } from 'mongodb';
-import 'dotenv/config'
+import 'dotenv/config';
+import cors from 'cors'
 
 const app = express();
 const PORT = 8000;
 
+// cors
+app.use(cors());
+// Parse incoming JSON data
+app.use(express.json())
 
 // connect data base
 
@@ -20,9 +25,22 @@ export async function connectToMongoDB() {
   }
 }
 
-connectToMongoDB()
+const mogoClient = await connectToMongoDB();
+const db = mogoClient.db("wanderlust");
+const destinationCollection = db.collection('destination');
 
-http://localhost:8000
+
+
+// Receive data from the frontend
+app.post('/add-destination', async(req, res)=>{
+  const data = req.body;
+  const result =await destinationCollection.insertOne(data);
+  res.send(result)
+});
+
+
+
+http://localhost:8000/add-destination
 app.get('/', (req, res) =>{
     res.send({message:'Server is runing fine!'})
 })
