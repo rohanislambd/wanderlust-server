@@ -38,6 +38,11 @@ app.post('/add-destination', async(req, res)=>{
   res.send(result)
 });
 
+// Get all destinations from the database
+app.get('/destinations', async(req, res)=>{
+  const result = await destinationCollection.find().toArray();
+  res.send(result);
+});
 
 
 http://localhost:8000/add-destination
