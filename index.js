@@ -52,6 +52,17 @@ app.get('/destination/:id', async(req, res)=>{
 })
 
 
+//edit destinations api
+app.patch('/destination/:id', async(req, res) => {
+  const {id} = req.params;
+  const updatedData = req.body;
+  const result  = await destinationCollection.updateOne(
+    {_id: new ObjectId(id)},
+    {$set:updatedData}
+  )
+  res.status(200).send(result)
+})
+
 http://localhost:8000/add-destination
 app.get('/', (req, res) =>{
     res.send({message:'Server is runing fine!'})
