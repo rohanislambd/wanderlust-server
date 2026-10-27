@@ -76,6 +76,7 @@ app.get('/', (req, res) =>{
 })
 
 
+// Receive data from the frontend
 app.post('/booking', async(req, res) =>{
   const data = req.body;
   const result = await bookingCollection.insertOne(data);
@@ -85,6 +86,13 @@ app.post('/booking', async(req, res) =>{
 app.get('/my-booking/:email', async(req, res) => {
   const {email} = req.params;
   const result = await bookingCollection.find({email: email}).toArray();
+  res.send(result)
+})
+
+//booking cencel 
+app.delete('/my-bookings/:id', async(req, res) => {
+  const {id} = req.params;
+  const result = await bookingCollection.deleteOne({_id: new ObjectId(id)});
   res.send(result)
 })
 
