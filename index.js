@@ -28,6 +28,7 @@ export async function connectToMongoDB() {
 const mogoClient = await connectToMongoDB();
 const db = mogoClient.db("wanderlust");
 const destinationCollection = db.collection('destination');
+const bookingCollection = db.collection("bookings")
 
 
 
@@ -69,9 +70,22 @@ app.delete('/destination/:id', async(req, res) =>{
   res.send(result)
 })
 
-http://localhost:8000/add-destination
+http://localhost:8000/booking
 app.get('/', (req, res) =>{
     res.send({message:'Server is runing fine!'})
+})
+
+
+app.post('/booking', async(req, res) =>{
+  const data = req.body;
+  const result = await bookingCollection.insertOne(data);
+  res.send(result)
+})
+
+app.get('/my-booking/:email', async(req, res) => {
+  const {email} = req.params;
+  const result = await bookingCollection.find({email: email}).toArray();
+  res.send(result)
 })
 
 app.listen(PORT, ()=>{
