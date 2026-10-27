@@ -52,7 +52,7 @@ app.get('/destination/:id', async(req, res)=>{
 })
 
 
-//edit destinations api
+//Update destinations api
 app.patch('/destination/:id', async(req, res) => {
   const {id} = req.params;
   const updatedData = req.body;
@@ -61,6 +61,12 @@ app.patch('/destination/:id', async(req, res) => {
     {$set:updatedData}
   )
   res.status(200).send(result)
+})
+//Delete destination api
+app.delete('/destination/:id', async(req, res) =>{
+  const {id} = req.params;
+  const result = await destinationCollection.deleteOne({_id: new ObjectId(id)});
+  res.send(result)
 })
 
 http://localhost:8000/add-destination
