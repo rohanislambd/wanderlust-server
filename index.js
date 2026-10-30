@@ -2,6 +2,7 @@ import express from 'express';
 import { MongoClient, ObjectId } from 'mongodb';
 import 'dotenv/config';
 import cors from 'cors'
+import { createRemoteJWKSet, jwtVerify } from 'jose';
 
 const app = express();
 const PORT = 8000;
@@ -31,15 +32,32 @@ const destinationCollection = db.collection('destination');
 const bookingCollection = db.collection("bookings")
 
 
-
- const verifyApi = (req, res, next)=>{
+//midleware
+ const verifyToken = async(req, res, next)=>{
   const authHeader = req.headers.authorization
-  console.log(authHeader);
-  if(authHeader !== "users logged in"){
+  
+  if(!authHeader){
     return res.status(401).send({mes: "Unauthrized!"})
   }
-  console.log('Iam middleware');
-  next()
+
+  const token = authHeader.split(" ")[1]
+  if(!token){
+     return res.status(401).send({mes: "Unauthrized!"})
+  }
+
+  const JWKS = createRemoteJWKSet(
+    new URL("http://localhost:3000/api/auth/jwks")
+  )
+
+  try {
+     const {payload} = await jwtVerify(token, JWKS)
+     next()
+  } catch (error) {
+    return res.status(500).send({mes: "Server Error!"})
+  }
+ 
+ 
+  
 }
 
 
@@ -57,7 +75,7 @@ app.get('/destinations', async(req, res)=>{
 });
 
 //destinations detail page api
-app.get('/destination/:id',verifyApi, async(req, res)=>{
+app.get('/destination/:id', verifyToken, async(req, res)=>{
 
   const {id} = req.params;
   const result = await destinationCollection.findOne({_id: new ObjectId(id)})
