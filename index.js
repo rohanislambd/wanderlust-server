@@ -32,6 +32,17 @@ const bookingCollection = db.collection("bookings")
 
 
 
+ const verifyApi = (req, res, next)=>{
+  const authHeader = req.headers.authorization
+  console.log(authHeader);
+  if(authHeader !== "users logged in"){
+    return res.status(401).send({mes: "Unauthrized!"})
+  }
+  console.log('Iam middleware');
+  next()
+}
+
+
 // Receive data from the frontend
 app.post('/add-destination', async(req, res)=>{
   const data = req.body;
@@ -46,7 +57,8 @@ app.get('/destinations', async(req, res)=>{
 });
 
 //destinations detail page api
-app.get('/destination/:id', async(req, res)=>{
+app.get('/destination/:id',verifyApi, async(req, res)=>{
+
   const {id} = req.params;
   const result = await destinationCollection.findOne({_id: new ObjectId(id)})
   res.send(result)
